@@ -18,6 +18,11 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v6
 
+      - name: Update commit hash
+        run: |
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+          sed -i "s/9eec34d2-fa74-413c-a262-4a7ec75baa90/$SHORT_SHA/g" web-app/templates/index.html
+
       - name: Upload web-app artifact
         uses: actions/upload-artifact@v4
         with:
