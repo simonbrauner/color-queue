@@ -1,0 +1,81 @@
+name: CI/CD pipeline
+
+env:
+  AZURE_WEBAPP_NAME: color-queue
+  PYTHON_VERSION: '3.14'
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v6
+
+      - name: Upload web-app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-app
+          path: web-app/**
+
+  build-web-app:
+    runs-on: ubuntu-latest
+    needs: package
+
+    steps:
+      - name: Download artifact from package job
+        uses: actions/download-artifact@v5
+        with:
+          name: web-app
+          path: .
+
+      - name: Set up Python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Create and start virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+
+      - name: Set up dependency caching for faster installs
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Smoke test Flask app
+        run: flask routes
+
+  deploy-web-app:
+    runs-on: ubuntu-latest
+    needs: build-web-app
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: Download artifact from package job
+        uses: actions/download-artifact@v5
+        with:
+          name: web-app
+          path: .
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@85270a1854658d167ab239bce43949edb336fa7c
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
