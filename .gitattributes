@@ -1,0 +1,2 @@
+.github/workflows/*.yml -linguist-vendored
+*.yml linguist-detectable=true
