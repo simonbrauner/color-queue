@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colors</title>
+</head>
+<body>
+    <h1>Colors</h1>
+    <table>
+        <tr>
+        {% for image_path in image_paths %}
+            <td>
+                <img src="{{ image_path }}">
+            </td>
+            {% if loop.index is divisibleby 3 and not loop.last %}
+                </tr><tr>
+            {% endif %}
+        {% endfor %}
+        </tr>
+    </table>
+</body>
+</html>

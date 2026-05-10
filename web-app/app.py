@@ -1,7 +1,11 @@
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return "<h1>Hello world</h1>"
+    image_paths = []
+    for _ in range(9):
+        image_paths.append("/static/a.png")
+
+    return render_template("index.html", image_paths=image_paths)
