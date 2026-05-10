@@ -1,0 +1,12 @@
+*
+
+!*/
+!.gitignore
+!.gitattributes
+!README.md
+!license
+
+!*.py
+!*.txt
+!*.yml
+!*.html
