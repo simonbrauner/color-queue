@@ -1,4 +1,7 @@
-from flask import Flask, render_template
+from os import urandom
+from re import match
+
+from flask import flash, Flask, redirect, render_template, request, url_for
 
 from azure.storage.blob import BlobServiceClient
 from azure.identity import DefaultAzureCredential
@@ -8,6 +11,7 @@ CONTAINER_NAME = "images"
 MAX_IMAGE_COUNT = 9
 
 app = Flask(__name__)
+app.secret_key = urandom(24)
 
 credential = DefaultAzureCredential()
 
@@ -24,3 +28,13 @@ def index():
         image_paths.append(f"{BLOB_ENDPOINT}/{CONTAINER_NAME}/{image.name}")
 
     return render_template("index.html", image_paths=image_paths)
+
+@app.route("/add", methods=["POST"])
+def add():
+    color = request.form.get("color")
+    if match(r'^#[0-9a-fA-F]{6}$', color):
+        flash(f"Success: Color queued, refresh in a few seconds.")
+    else:
+        flash("Error: Invalid color format.")
+
+    return redirect(url_for("index"))

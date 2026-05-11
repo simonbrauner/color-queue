@@ -19,6 +19,17 @@
         {% endfor %}
         </tr>
     </table>
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    {% endwith %}
+    <form action="/add" method="POST">
+        <label for="color">Color (# and 6 hexadecimal digits):</label>
+        <br>
+        <input type="text" id="color" name="color" placeholder="#9eec34d" required pattern="^#([0-9a-fA-F]{6})$">
+        <button type="submit">Add square</button>
+    </form>
     <p><a href="https://github.com/simonbrauner/color-queue">GitHub</a> <code>9eec34d2-fa74-413c-a262-4a7ec75baa90</code></p>
 </body>
 </html>
